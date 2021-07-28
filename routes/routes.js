@@ -9,6 +9,7 @@ module.exports = function () {
   });
 
   router.get("/veiculos", carsControllers.get_cars);
+  router.get("/buscarVeiculos", carsControllers.search_cars);
   router.get("/veiculos/:id", carsControllers.get_car_id);
   router.post("/veiculos", carsControllers.create_cars);
   router.delete("/veiculos/:id", carsControllers.delete_car);

@@ -4,7 +4,6 @@ const carSchema = new Schema(
   {
     veiculo: {
       type: String,
-      unique: true,
       required: true,
     },
     marca: {
@@ -16,7 +15,7 @@ const carSchema = new Schema(
       required: true,
     },
     descripcion: String,
-    vendido: Boolean,
+    vendido: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

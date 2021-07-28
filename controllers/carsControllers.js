@@ -2,15 +2,16 @@ const Car = require("../models/Car");
 
 exports.get_cars = async (req, res, next) => {
   const cars = await Car.find({});
-  if (cars !== null) {
+  if (cars !== null && cars.length > 0) {
     return res.json(cars);
   }
+  res.status(404).end();
 };
 
 exports.get_car_id = (req, res, next) => {
-  const car = Car.findById(req.params.id)
+  Car.findById(req.params.id)
     .then((carid) => {
-      if (car !== null) {
+      if (carid !== null) {
         return res.json(carid);
       }
       res.status(404).end();
@@ -21,7 +22,7 @@ exports.get_car_id = (req, res, next) => {
 };
 
 exports.create_cars = async (req, res, next) => {
-  const car = res.body;
+  const car = req.body;
   if (!car.veiculo) {
     return res
       .status(400)
@@ -30,8 +31,7 @@ exports.create_cars = async (req, res, next) => {
   const newCar = new Car({
     veiculo: car.veiculo,
     marca: car.marca,
-    marca: car.marca,
-    ano: car.ano,
+    ano: car.año,
     descripcion: car.descripcion,
     vendido: car.vendido,
   });
@@ -50,18 +50,17 @@ exports.delete_car = async (req, res, next) => {
 
 exports.put_car = (req, res, next) => {
   const { id } = req.params;
-  const car = res.body;
+  const car = req.body;
   const newCar = {
     veiculo: car.veiculo,
     marca: car.marca,
-    marca: car.marca,
-    ano: car.ano,
+    ano: car.año,
     descripcion: car.descripcion,
     vendido: car.vendido,
   };
   Car.findByIdAndUpdate(id, newCar, { new: true })
     .then((result) => {
-      response.json(result);
+      res.json(result);
     })
     .catch((err) => {
       res.status(400).end();
@@ -70,14 +69,28 @@ exports.put_car = (req, res, next) => {
 
 exports.patch_car = async (req, res, next) => {
   const { id } = req.params;
-  const { vendido } = res.body;
-  const car = Car.findById(id);
+  const { vendido } = req.body;
+  const car = await Car.findById(id);
   if (car.vendido != vendido) {
     car.vendido = vendido;
   }
   Car.findByIdAndUpdate(id, car, { new: true })
     .then((result) => {
-      response.json(result);
+      res.json(result);
+    })
+    .catch((err) => {
+      res.status(400).end();
+    });
+};
+
+exports.search_cars = async (req, res, next) => {
+  const data = req.query;
+  Car.find(data)
+    .then((resp) => {
+      if (resp !== null && resp.length > 0) {
+        return res.json(resp);
+      }
+      res.status(400).end();
     })
     .catch((err) => {
       res.status(400).end();
