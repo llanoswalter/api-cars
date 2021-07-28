@@ -1,9 +1,10 @@
 const Car = require("../models/Car");
+const { validationResult } = require("express-validator");
 
 exports.get_cars = async (req, res, next) => {
   const cars = await Car.find({});
   if (cars !== null && cars.length > 0) {
-    return res.json(cars);
+    return res.status(200).json(cars);
   }
   res.status(404).end();
 };
@@ -22,6 +23,10 @@ exports.get_car_id = (req, res, next) => {
 };
 
 exports.create_cars = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty() || !errors == undefined) {
+    return next({ error: "params is requieres" });
+  }
   const car = req.body;
   if (!car.veiculo) {
     return res
@@ -35,20 +40,37 @@ exports.create_cars = async (req, res, next) => {
     descripcion: car.descripcion,
     vendido: car.vendido,
   });
-  newCar.save().then((savedCar) => {
-    res.json(savedCar);
-  });
+  newCar
+    .save()
+    .then((savedCar) => {
+      res.json(savedCar);
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
-exports.delete_car = async (req, res, next) => {
+exports.delete_car = (req, res, next) => {
   const { id } = req.params;
-  const respuesta = await Car.findByIdAndDelete(id);
-  if (respuesta === null) return res.sendStatus(404);
-
-  res.status(204).end();
+  try {
+    Car.findByIdAndDelete(id)
+      .then(() => {
+        res.status(204).end();
+      })
+      .catch((err) => {
+        next(err);
+      });
+  } catch (error) {
+    next(error);
+  }
 };
 
 exports.put_car = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty() || !errors == undefined) {
+    return next({ error: "params is requieres" });
+  }
+
   const { id } = req.params;
   const car = req.body;
   const newCar = {
@@ -63,11 +85,15 @@ exports.put_car = (req, res, next) => {
       res.json(result);
     })
     .catch((err) => {
-      res.status(400).end();
+      next(err);
     });
 };
 
 exports.patch_car = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty() || !errors == undefined) {
+    return next({ error: "params is requieres" });
+  }
   const { id } = req.params;
   const { vendido } = req.body;
   const car = await Car.findById(id);

@@ -1,8 +1,10 @@
 const mongoose = require("mongoose");
 
 require("dotenv").config({ path: "variables.env" });
-const contectionsString = process.env.bd_string;
-
+let contectionsString = process.env.bd_string;
+if (process.env.NODE_ENV === "test") {
+  contectionsString = process.env.TEST_MONGODB_URI;
+}
 mongoose
   .connect(contectionsString, {
     useNewUrlParser: true,

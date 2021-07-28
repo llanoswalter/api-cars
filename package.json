@@ -4,8 +4,9 @@
   "description": "Ejercicio Api Rest con node y MongoDB",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand "
   },
   "author": "Llanos Walter",
   "license": "ISC",
@@ -17,6 +18,12 @@
     "mongoose": "5.13.3"
   },
   "devDependencies": {
-    "nodemon": "2.0.12"
+    "cross-env": "7.0.3",
+    "jest": "27.0.6",
+    "nodemon": "2.0.12",
+    "supertest": "6.1.4"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
